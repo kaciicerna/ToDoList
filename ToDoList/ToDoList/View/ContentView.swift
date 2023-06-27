@@ -12,18 +12,27 @@ struct ContentView: View {
     @State private var isShowingAddSheet = false
     @State private var filterState: Bool? = nil
     
+    let columns: [GridItem] = [
+        GridItem(.flexible()),
+        GridItem(.flexible())
+    ]
+    
     var body: some View {
         NavigationView {
             VStack {
-                List {
-                    ForEach(viewModel.todoItems.filter {
-                        filterState == nil ? true : $0.state == filterState
-                    }) { item in
-                        NavigationLink(destination: DetailView(item: item)) {
-                            TodoListItemView(item: item)
+                ScrollView {
+                    LazyVGrid(columns: columns, spacing: 16) {
+                        ForEach(viewModel.todoItems
+                                    .filter { filterState == nil ? true : $0.state == filterState }
+                                    .sorted(by: { $0.dueDate ?? Date() < $1.dueDate ?? Date() })
+                        ) { item in
+                            NavigationLink(destination: DetailView(item: item)) {
+                                TodoListItemView(item: item)
+                                    .frame(maxWidth: .infinity)
+                            }
                         }
                     }
-                    .onDelete(perform: viewModel.deleteTodoItem)
+                    .padding()
                 }
                 
                 HStack {
@@ -75,13 +84,6 @@ struct ContentView: View {
         .environmentObject(viewModel)
     }
 }
-
-private let itemFormatter: DateFormatter = {
-    let formatter = DateFormatter()
-    formatter.dateStyle = .short
-    formatter.timeStyle = .medium
-    return formatter
-}()
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {

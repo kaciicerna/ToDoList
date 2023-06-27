@@ -27,15 +27,17 @@ class TodoViewModel: ObservableObject {
         }
     }
     
-    func addTodoItem(title: String, description: String, dueDate: Date) {
+    func addTodoItem(title: String, description: String, dueDate: Date, latitude: Double?, longitude: Double?) {
         let newItem = TodoItem(context: viewContext)
         newItem.title = title
         newItem.itemDescription = description
-        newItem.state = false
         newItem.dueDate = dueDate
-        
+        newItem.latitude = latitude ?? 0.0
+        newItem.longitude = longitude ?? 0.0
+
         saveContext()
     }
+
     
     func deleteTodoItem(indexSet: IndexSet) {
         indexSet.forEach { index in
