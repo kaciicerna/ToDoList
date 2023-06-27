@@ -10,6 +10,7 @@ import SwiftUI
 struct DetailView: View {
     @ObservedObject var item: TodoItem
     @State private var isEditing = false
+    @Environment(\.managedObjectContext) private var managedObjectContext
     
     var body: some View {
         VStack(spacing: 16) {
@@ -41,11 +42,32 @@ struct DetailView: View {
                     Image(systemName: "pencil")
                 }
             }
+            
+            ToolbarItem(placement: .navigationBarTrailing) {
+                Button(action: {
+                    deleteItem()
+                }) {
+                    Image(systemName: "trash")
+                }
+                .foregroundColor(.red)
+            }
         }
         .sheet(isPresented: $isEditing) {
             EditItemView(item: item, isPresented: $isEditing)
+                .environment(\.managedObjectContext, managedObjectContext)
+        }
+    }
+    
+    private func deleteItem() {
+        managedObjectContext.delete(item)
+        
+        do {
+            try managedObjectContext.save()
+        } catch {
+            print("Failed to delete item:", error)
         }
     }
 }
+
 
 
