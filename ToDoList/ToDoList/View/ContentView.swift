@@ -20,7 +20,7 @@ struct ContentView: View {
                         filterState == nil ? true : $0.state == filterState
                     }) { item in
                         NavigationLink(destination: DetailView(item: item)) {
-                            Text(item.title!)
+                            TodoListItemView(item: item)
                         }
                     }
                     .onDelete(perform: viewModel.deleteTodoItem)
@@ -32,6 +32,11 @@ struct ContentView: View {
                         isShowingAddSheet = true
                     }) {
                         Image(systemName: "plus")
+                            .font(.title3)
+                            .foregroundColor(.white)
+                            .padding()
+                            .background(Color.blue)
+                            .clipShape(Circle())
                     }
                     .padding()
                 }
@@ -64,61 +69,12 @@ struct ContentView: View {
             }
         }
         .sheet(isPresented: $isShowingAddSheet) {
-            AddTodoView(viewModel: viewModel, isPresented: $isShowingAddSheet)
+            AddTodoItemView(viewModel: viewModel, isPresented: $isShowingAddSheet)
+                .environmentObject(viewModel)
         }
-
+        .environmentObject(viewModel)
     }
 }
-
-struct AddTodoView: View {
-    @Environment(\.presentationMode) private var presentationMode
-    @ObservedObject var viewModel: TodoViewModel
-    @Binding var isPresented: Bool
-    
-    @State private var title = ""
-    @State private var description = ""
-    @State private var dueDate = Date()
-    
-    var body: some View {
-        NavigationView {
-            Form {
-                Section(header: Text("Details")) {
-                    TextField("Title", text: $title)
-                    TextField("Description", text: $description)
-                    DatePicker("Due Date", selection: $dueDate)
-                }
-                
-                Section {
-                    Button("Add Todo") {
-                        viewModel.addTodoItem(title: title, description: description, dueDate: dueDate)
-                        presentationMode.wrappedValue.dismiss()
-                    }
-                }
-            }
-            .navigationTitle("Add Todo")
-        }
-    }
-}
-
-
-struct DetailView: View {
-    @ObservedObject var item: TodoItem
-    
-    var body: some View {
-        VStack {
-            Text(item.title ?? "Unknown")
-                .font(.title)
-                .padding()
-            
-            Text(item.itemDescription ?? "None")
-                .padding()
-            
-            // Add additional details like attachments, location, etc.
-        }
-        .navigationTitle("Detail")
-    }
-}
-
 
 private let itemFormatter: DateFormatter = {
     let formatter = DateFormatter()

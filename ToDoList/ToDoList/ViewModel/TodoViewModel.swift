@@ -46,7 +46,7 @@ class TodoViewModel: ObservableObject {
         saveContext()
     }
     
-    private func saveContext() {
+    internal func saveContext() {
         do {
             try viewContext.save()
         } catch {
