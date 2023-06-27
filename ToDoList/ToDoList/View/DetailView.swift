@@ -15,18 +15,26 @@ struct DetailView: View {
     var body: some View {
         VStack(spacing: 16) {
             Text(item.itemDescription ?? "None")
-                .font(.body)
-                .foregroundColor(.secondary)
+                .font(.title2)
+                .foregroundColor(.primary)
+                .multilineTextAlignment(.center)
+                .padding()
+            
+            Text("\(item.dueDate ?? Date(), formatter: dateFormatter)")
+                .font(.subheadline)
+                .foregroundColor(.gray)
             
             Button(action: {
                 item.state.toggle()
             }) {
                 Text(item.state ? "Done" : "Open")
-                    .font(.headline)
+                    .font(.title3)
+                    .fontWeight(.bold)
                     .padding()
                     .foregroundColor(.white)
                     .background(item.state ? Color.green : Color.blue)
                     .cornerRadius(10)
+                    .padding(.horizontal, 30)
             }
             .buttonStyle(PlainButtonStyle())
             
@@ -67,7 +75,13 @@ struct DetailView: View {
             print("Failed to delete item:", error)
         }
     }
+    
+    private let dateFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateStyle = .long
+        formatter.timeStyle = .short
+        return formatter
+    }()
 }
-
 
 

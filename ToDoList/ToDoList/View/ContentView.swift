@@ -11,6 +11,7 @@ struct ContentView: View {
     @StateObject private var viewModel = TodoViewModel()
     @State private var isShowingAddSheet = false
     @State private var filterState: Bool? = nil
+    @State private var isEditing = false
     
     let columns: [GridItem] = [
         GridItem(.flexible()),
@@ -31,6 +32,7 @@ struct ContentView: View {
                                     .frame(maxWidth: .infinity)
                             }
                         }
+                        .onDelete(perform: viewModel.deleteTodoItem)
                     }
                     .padding()
                 }
@@ -85,8 +87,4 @@ struct ContentView: View {
     }
 }
 
-struct ContentView_Previews: PreviewProvider {
-    static var previews: some View {
-        ContentView().environment(\.managedObjectContext, PersistenceController.preview.container.viewContext)
-    }
-}
+
