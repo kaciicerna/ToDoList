@@ -20,27 +20,46 @@ struct DetailView: View {
                 .multilineTextAlignment(.center)
                 .padding()
             
-            Text("Místo: \(item.locationName ?? "None")")
-                .font(.subheadline)
-                .foregroundColor(.primary)
+            VStack(spacing: 8) {
+                HStack {
+                    Image(systemName: "location.fill")
+                        .foregroundColor(.blue)
+
+                    Text(item.locationName ?? "None")
+                        .font(.subheadline)
+                        .foregroundColor(.primary)
+                }
+                
+                HStack {
+                    Image(systemName: "calendar")
+                        .foregroundColor(.blue)
+
+                    Text("\(item.dueDate ?? Date(), formatter: dateFormatter)")
+                        .font(.subheadline)
+                        .foregroundColor(.gray)
+                }
+            }
             
-            Text("\(item.dueDate ?? Date(), formatter: dateFormatter)")
-                .font(.subheadline)
-                .foregroundColor(.gray)
-                        
             Button(action: {
                 item.state.toggle()
             }) {
-                Text(item.state ? "Done" : "Open")
-                    .font(.title3)
-                    .fontWeight(.bold)
-                    .padding()
-                    .foregroundColor(.white)
-                    .background(item.state ? Color.green : Color.blue)
-                    .cornerRadius(10)
-                    .padding(.horizontal, 30)
+                HStack(spacing: 8) {
+                    Image(systemName: item.state ? "checkmark.circle.fill" : "circle")
+                        .font(.title2)
+                        .foregroundColor(.white)
+                    
+                    Text(item.state ? "Done" : "Open")
+                        .font(.title3)
+                        .fontWeight(.bold)
+                        .foregroundColor(.white)
+                }
+                .padding()
+                .background(item.state ? Color.green : Color.blue)
+                .cornerRadius(10)
+                .padding(.horizontal, 30)
             }
             .buttonStyle(PlainButtonStyle())
+
             
             Spacer()
         }

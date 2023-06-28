@@ -7,18 +7,20 @@
 
 import SwiftUI
 import MapKit
+import CoreLocation
 
 struct AddTodoItemView: View {
     @Environment(\.presentationMode) private var presentationMode
     @ObservedObject var viewModel: TodoViewModel
     @Binding var isPresented: Bool
+    @State private var placemark: CLPlacemark? = nil
     
     @State private var title = ""
     @State private var description = ""
     @State private var coordinate: CLLocationCoordinate2D? = nil
     @State private var locationName = ""
     @State private var dueDate = Date()
-    @State private var showMapPicker = false // New state variable
+    @State private var showMapPicker = false
     
     var body: some View {
         NavigationView {
@@ -34,11 +36,6 @@ struct AddTodoItemView: View {
                         showMapPicker = true
                     }) {
                         Text("Select Location")
-                    }
-                    
-                    if let coordinate = coordinate {
-                        Text("Latitude: \(coordinate.latitude)")
-                        Text("Longitude: \(coordinate.longitude)")
                     }
                     
                     TextField("Location Name", text: $locationName)
@@ -62,7 +59,6 @@ struct AddTodoItemView: View {
                     }
                     .buttonStyle(PlainButtonStyle())
                 }
-
             }
             .navigationTitle("Add ToDo")
             .sheet(isPresented: $showMapPicker) {
@@ -71,7 +67,6 @@ struct AddTodoItemView: View {
         }
     }
 }
-
 
 struct MapPickerView: View {
     @Binding var coordinate: CLLocationCoordinate2D?
@@ -94,11 +89,31 @@ struct MapPickerView: View {
                 
                 TextField("Location Name", text: $locationName)
                     .padding()
+                    .onChange(of: locationName) { newValue in
+                        geocodeLocation()
+                    }
             }
         }
     }
+    
+    private func geocodeLocation() {
+        let geocoder = CLGeocoder()
+        geocoder.geocodeAddressString(locationName) { placemarks, error in
+            if let error = error {
+                print("Geocoding error: \(error.localizedDescription)")
+                return
+            }
+            
+            guard let placemark = placemarks?.first,
+                  let location = placemark.location else {
+                print("No coordinates found for the location.")
+                return
+            }
+            
+            coordinate = location.coordinate
+        }
+    }
 }
-
 
 struct MapView: UIViewRepresentable {
     @Binding var coordinate: CLLocationCoordinate2D?
