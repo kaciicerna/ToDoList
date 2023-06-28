@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import MapKit
 
 struct DetailView: View {
     @ObservedObject var item: TodoItem
@@ -59,7 +60,6 @@ struct DetailView: View {
                 .padding(.horizontal, 30)
             }
             .buttonStyle(PlainButtonStyle())
-
             
             Spacer()
         }
