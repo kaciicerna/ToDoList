@@ -20,10 +20,14 @@ struct DetailView: View {
                 .multilineTextAlignment(.center)
                 .padding()
             
+            Text("Místo: \(item.locationName ?? "None")")
+                .font(.subheadline)
+                .foregroundColor(.primary)
+            
             Text("\(item.dueDate ?? Date(), formatter: dateFormatter)")
                 .font(.subheadline)
                 .foregroundColor(.gray)
-            
+                        
             Button(action: {
                 item.state.toggle()
             }) {

@@ -16,7 +16,9 @@ struct AddTodoItemView: View {
     @State private var title = ""
     @State private var description = ""
     @State private var coordinate: CLLocationCoordinate2D? = nil
+    @State private var locationName = ""
     @State private var dueDate = Date()
+    @State private var showMapPicker = false // New state variable
     
     var body: some View {
         NavigationView {
@@ -28,22 +30,75 @@ struct AddTodoItemView: View {
                 }
                 
                 Section(header: Text("Location")) {
-                    MapView(coordinate: $coordinate)
-                        .frame(height: 200)
-                        .cornerRadius(10)
+                    Button(action: {
+                        showMapPicker = true
+                    }) {
+                        Text("Select Location")
+                    }
+                    
+                    if let coordinate = coordinate {
+                        Text("Latitude: \(coordinate.latitude)")
+                        Text("Longitude: \(coordinate.longitude)")
+                    }
+                    
+                    TextField("Location Name", text: $locationName)
                 }
                 
                 Section {
-                    Button("Add Todo") {
-                        viewModel.addTodoItem(title: title, description: description, dueDate: dueDate, latitude: coordinate?.latitude, longitude: coordinate?.longitude)
+                    Button(action: {
+                        viewModel.addTodoItem(title: title, description: description, dueDate: dueDate, latitude: coordinate?.latitude, longitude: coordinate?.longitude, locationName: locationName)
                         presentationMode.wrappedValue.dismiss()
+                    }) {
+                        Text("Add ToDo")
+                            .font(.headline)
+                            .foregroundColor(.white)
+                            .padding()
+                            .frame(maxWidth: .infinity)
+                            .background(
+                                LinearGradient(gradient: Gradient(colors: [Color.blue, Color.purple]), startPoint: .leading, endPoint: .trailing)
+                            )
+                            .cornerRadius(10)
+                            .shadow(color: Color.black.opacity(0.3), radius: 3, x: 0, y: 2)
                     }
+                    .buttonStyle(PlainButtonStyle())
                 }
+
             }
             .navigationTitle("Add ToDo")
+            .sheet(isPresented: $showMapPicker) {
+                MapPickerView(coordinate: $coordinate, locationName: $locationName, isPresented: $showMapPicker)
+            }
         }
     }
 }
+
+
+struct MapPickerView: View {
+    @Binding var coordinate: CLLocationCoordinate2D?
+    @Binding var locationName: String
+    @Binding var isPresented: Bool
+    
+    var body: some View {
+        NavigationView {
+            VStack {
+                MapView(coordinate: $coordinate)
+                    .navigationBarTitle("Select Location", displayMode: .inline)
+                    .navigationBarItems(
+                        trailing: Button(action: {
+                            isPresented = false
+                        }) {
+                            Text("Done")
+                                .bold()
+                        }
+                    )
+                
+                TextField("Location Name", text: $locationName)
+                    .padding()
+            }
+        }
+    }
+}
+
 
 struct MapView: UIViewRepresentable {
     @Binding var coordinate: CLLocationCoordinate2D?

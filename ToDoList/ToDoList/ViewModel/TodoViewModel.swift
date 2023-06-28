@@ -7,6 +7,7 @@
 
 import SwiftUI
 import CoreData
+import LocalAuthentication
 
 class TodoViewModel: ObservableObject {
     @Published var todoItems: [TodoItem] = []
@@ -27,13 +28,14 @@ class TodoViewModel: ObservableObject {
         }
     }
     
-    func addTodoItem(title: String, description: String, dueDate: Date, latitude: Double?, longitude: Double?) {
+    func addTodoItem(title: String, description: String, dueDate: Date, latitude: Double?, longitude: Double?, locationName: String) {
         let newItem = TodoItem(context: viewContext)
         newItem.title = title
         newItem.itemDescription = description
         newItem.dueDate = dueDate
         newItem.latitude = latitude ?? 0.0
         newItem.longitude = longitude ?? 0.0
+        newItem.locationName = locationName
 
         saveContext()
     }
@@ -48,6 +50,12 @@ class TodoViewModel: ObservableObject {
         saveContext()
     }
     
+    func deleteTodoItem(item: TodoItem) {
+        if let index = todoItems.firstIndex(of: item) {
+            todoItems.remove(at: index)
+        }
+    }
+    
     internal func saveContext() {
         do {
             try viewContext.save()
@@ -57,5 +65,27 @@ class TodoViewModel: ObservableObject {
         
         fetchTodoItems()
     }
+    
+    func authenticateWithFaceID(completion: @escaping (Bool) -> Void) {
+        let context = LAContext()
+        var error: NSError?
+        
+        if context.canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: &error) {
+            // Use Face ID authentication
+            context.evaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, localizedReason: "Unlock your app") { success, authenticationError in
+                DispatchQueue.main.async {
+                    if success {
+                        completion(true) // Face ID authentication succeeded
+                    } else {
+                        completion(false) // Face ID authentication failed
+                    }
+                }
+            }
+        } else {
+            // Face ID is not available or not configured, handle the error
+            completion(false)
+        }
+    }
+
 }
 

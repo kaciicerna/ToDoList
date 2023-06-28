@@ -9,20 +9,33 @@ import SwiftUI
 
 struct TodoListItemView: View {
     @ObservedObject var item: TodoItem
+    let deleteTodoItem: () -> Void
     
     var body: some View {
+        
         VStack(alignment: .leading, spacing: 8) {
-            if item.state {
-                Text(item.title ?? "Unknown")
-                    .font(.title2)
-                    .foregroundColor(.red)
-                    .strikethrough()
-            } else {
-                Text(item.title ?? "Unknown")
-                    .font(.title2)
-                    .fontWeight(item.state ? .regular : .bold)
+            HStack {
+                if item.state {
+                    Text(item.title ?? "Unknown")
+                        .font(.title2)
+                        .foregroundColor(.red)
+                        .strikethrough()
+                } else {
+                    Text(item.title ?? "Unknown")
+                        .font(.title2)
+                        .fontWeight(item.state ? .regular : .bold)
+                }
+                
+                Spacer()
+                
+                Button(action: {
+                    deleteTodoItem()
+                }) {
+                    Image(systemName: "trash")
+                        .foregroundColor(.red)
+                        .font(.footnote)
+                }
             }
-            
             Text(item.itemDescription ?? "No description")
                 .font(.subheadline)
                 .foregroundColor(.gray)
@@ -33,6 +46,7 @@ struct TodoListItemView: View {
                     .font(.subheadline)
                     .foregroundColor(.black)
             }
+
         }
         .padding()
         .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -41,6 +55,8 @@ struct TodoListItemView: View {
                 .foregroundColor(.white)
                 .shadow(color: Color.gray.opacity(0.4), radius: 4, x: 0, y: 2)
         )
+        
+        
     }
     
     private let dateFormatter: DateFormatter = {

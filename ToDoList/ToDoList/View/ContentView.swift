@@ -6,12 +6,14 @@
 //
 
 import SwiftUI
+import LocalAuthentication
 
 struct ContentView: View {
     @StateObject private var viewModel = TodoViewModel()
     @State private var isShowingAddSheet = false
     @State private var filterState: Bool? = nil
     @State private var isEditing = false
+    @State private var isFaceIDAuthenticated = false
     
     let columns: [GridItem] = [
         GridItem(.flexible()),
@@ -19,71 +21,82 @@ struct ContentView: View {
     ]
     
     var body: some View {
-        NavigationView {
-            VStack {
-                ScrollView {
-                    LazyVGrid(columns: columns, spacing: 16) {
-                        ForEach(viewModel.todoItems
-                                    .filter { filterState == nil ? true : $0.state == filterState }
-                                    .sorted(by: { $0.dueDate ?? Date() < $1.dueDate ?? Date() })
-                        ) { item in
-                            NavigationLink(destination: DetailView(item: item)) {
-                                TodoListItemView(item: item)
-                                    .frame(maxWidth: .infinity)
+        // if isFaceIDAuthenticated {
+            NavigationView {
+                VStack {
+                    ScrollView {
+                        LazyVGrid(columns: columns, spacing: 16) {
+                            ForEach(viewModel.todoItems
+                                .filter { filterState == nil ? true : $0.state == filterState }
+                                .sorted(by: { $0.dueDate ?? Date() < $1.dueDate ?? Date() })
+                            ) { item in
+                                NavigationLink(destination: DetailView(item: item)) {
+                                    TodoListItemView(item: item, deleteTodoItem: { viewModel.deleteTodoItem(item: item) })
+                                        .frame(maxWidth: .infinity)
+                                }
                             }
+                            .onDelete(perform: viewModel.deleteTodoItem)
                         }
-                        .onDelete(perform: viewModel.deleteTodoItem)
+                        .padding()
                     }
-                    .padding()
+                    
+                    HStack {
+                        Spacer()
+                        Button(action: {
+                            isShowingAddSheet = true
+                        }) {
+                            Image(systemName: "plus")
+                                .font(.title3)
+                                .foregroundColor(.white)
+                                .padding()
+                                .background(Color.blue)
+                                .clipShape(Circle())
+                        }
+                        .padding()
+                    }
                 }
-                
-                HStack {
-                    Spacer()
-                    Button(action: {
-                        isShowingAddSheet = true
-                    }) {
-                        Image(systemName: "plus")
-                            .font(.title3)
-                            .foregroundColor(.white)
-                            .padding()
-                            .background(Color.blue)
-                            .clipShape(Circle())
+                .navigationTitle("Todo List")
+                .toolbar {
+                    ToolbarItem(placement: .navigationBarTrailing) {
+                        Menu {
+                            Button(action: {
+                                filterState = true
+                            }) {
+                                Label("Done", systemImage: "checkmark.circle.fill")
+                            }
+                            
+                            Button(action: {
+                                filterState = false
+                            }) {
+                                Label("Open", systemImage: "circle")
+                            }
+                            
+                            Button(action: {
+                                filterState = nil
+                            }) {
+                                Label("All", systemImage: "list.bullet")
+                            }
+                        } label: {
+                            Image(systemName: "line.horizontal.3.decrease.circle")
+                        }
                     }
-                    .padding()
                 }
             }
-            .navigationTitle("Todo List")
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Menu {
-                        Button(action: {
-                            filterState = true
-                        }) {
-                            Label("Done", systemImage: "checkmark.circle.fill")
-                        }
-                        
-                        Button(action: {
-                            filterState = false
-                        }) {
-                            Label("Open", systemImage: "circle")
-                        }
-                        
-                        Button(action: {
-                            filterState = nil
-                        }) {
-                            Label("All", systemImage: "list.bullet")
-                        }
-                    } label: {
-                        Image(systemName: "line.horizontal.3.decrease.circle")
-                    }
-                }
+            .sheet(isPresented: $isShowingAddSheet) {
+                AddTodoItemView(viewModel: viewModel, isPresented: $isShowingAddSheet)
+                    .environmentObject(viewModel)
             }
-        }
-        .sheet(isPresented: $isShowingAddSheet) {
-            AddTodoItemView(viewModel: viewModel, isPresented: $isShowingAddSheet)
-                .environmentObject(viewModel)
-        }
-        .environmentObject(viewModel)
+            .environmentObject(viewModel)
+//            .onAppear {
+//                viewModel.authenticateWithFaceID { success in
+//                    isFaceIDAuthenticated = success
+//                }
+//            }
+//        } else {
+//            Text("Face ID authentication failed")
+//                .font(.title)
+//                .foregroundColor(.red)
+//        }
     }
 }
 
