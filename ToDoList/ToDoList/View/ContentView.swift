@@ -40,7 +40,9 @@ struct ContentView: View {
                 }
                 
                 HStack {
+                    
                     Spacer()
+                    
                     Button(action: {
                         isShowingAddSheet = true
                     }) {

@@ -75,14 +75,13 @@ class TodoViewModel: ObservableObject {
             context.evaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, localizedReason: "Unlock your app") { success, authenticationError in
                 DispatchQueue.main.async {
                     if success {
-                        completion(true) // Face ID authentication succeeded
+                        completion(true)
                     } else {
-                        completion(false) // Face ID authentication failed
+                        completion(false)
                     }
                 }
             }
         } else {
-            // Face ID is not available or not configured, handle the error
             completion(false)
         }
     }

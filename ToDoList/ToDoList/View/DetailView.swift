@@ -25,7 +25,7 @@ struct DetailView: View {
                 HStack {
                     Image(systemName: "location.fill")
                         .foregroundColor(.blue)
-
+                    
                     Text(item.locationName ?? "None")
                         .font(.subheadline)
                         .foregroundColor(.primary)
@@ -34,7 +34,7 @@ struct DetailView: View {
                 HStack {
                     Image(systemName: "calendar")
                         .foregroundColor(.blue)
-
+                    
                     Text("\(item.dueDate ?? Date(), formatter: dateFormatter)")
                         .font(.subheadline)
                         .foregroundColor(.gray)

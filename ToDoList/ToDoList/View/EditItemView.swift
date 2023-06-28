@@ -12,7 +12,7 @@ struct EditItemView: View {
     @ObservedObject var item: TodoItem
     @Binding var isPresented: Bool
     @State private var showMapPicker = false
-
+    
     @State private var editedTitle: String
     @State private var editedDescription: String
     @State private var editedLocationName: String
@@ -66,7 +66,7 @@ struct EditItemView: View {
                     }
                     .buttonStyle(PlainButtonStyle())
                 }
-
+                
             }
             .navigationTitle("Edit Todo")
             .toolbar {

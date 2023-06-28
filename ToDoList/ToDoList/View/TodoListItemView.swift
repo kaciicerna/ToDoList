@@ -14,6 +14,7 @@ struct TodoListItemView: View {
     var body: some View {
         
         VStack(alignment: .leading, spacing: 8) {
+            
             HStack {
                 if item.state {
                     Text(item.title ?? "Unknown")
@@ -36,6 +37,7 @@ struct TodoListItemView: View {
                         .font(.footnote)
                 }
             }
+            
             Text(item.itemDescription ?? "No description")
                 .font(.subheadline)
                 .foregroundColor(.gray)
@@ -46,7 +48,7 @@ struct TodoListItemView: View {
                     .font(.subheadline)
                     .foregroundColor(.black)
             }
-
+            
         }
         .padding()
         .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -55,8 +57,6 @@ struct TodoListItemView: View {
                 .foregroundColor(.white)
                 .shadow(color: Color.gray.opacity(0.4), radius: 4, x: 0, y: 2)
         )
-        
-        
     }
     
     private let dateFormatter: DateFormatter = {
